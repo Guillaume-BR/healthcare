@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prédiction de la Durée de Séjour</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <h1>Prédiction Interactive</h1>
+        <nav>
+            <a href="index.html">Statistiques</a>
+            <a href="prediction.html">Prédiction Interactive</a>
+        </nav>
+    </header>
+
+    <main>
+        <section class="prediction-section">
+            <h2>Prédire la Durée de Séjour à l'Hôpital</h2>
+            <p class="description">Utilisez ce formulaire pour estimer la durée de séjour d'un patient en fonction de ses caractéristiques.</p>
+
+            <form id="predictionForm" class="prediction-form">
+                <div class="form-group">
+                    <label for="age">Âge du patient:</label>
+                    <input type="number" id="age" name="age" min="0" max="120" required>
+                    <span class="unit">ans</span>
+                </div>
+
+                <div class="form-group">
+                    <label>Sexe:</label>
+                    <div class="radio-group">
+                        <label class="radio-label">
+                            <input type="radio" name="sexe" value="M" checked>
+                            <span>Masculin</span>
+                        </label>
+                        <label class="radio-label">
+                            <input type="radio" name="sexe" value="F">
+                            <span>Féminin</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Type d'admission:</label>
+                    <div class="radio-group">
+                        <label class="radio-label">
+                            <input type="radio" name="type_admission" value="urgence" checked>
+                            <span>Urgence</span>
+                        </label>
+                        <label class="radio-label">
+                            <input type="radio" name="type_admission" value="programme">
+                            <span>Programmée</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="severite">Sévérité du cas:</label>
+                    <select id="severite" name="severite" required>
+                        <option value="">-- Sélectionner --</option>
+                        <option value="faible">Faible</option>
+                        <option value="moyen">Moyen</option>
+                        <option value="eleve">Élevé</option>
+                    </select>
+                </div>
+
+                <div class="button-group">
+                    <button type="submit" class="btn btn-primary">Prédire la Durée</button>
+                    <button type="reset" class="btn btn-secondary">Réinitialiser</button>
+                </div>
+            </form>
+
+            <div id="result" class="result-container" style="display: none;">
+                <h3>Résultat de la Prédiction</h3>
+                <div class="result-content">
+                    <p class="result-main">Durée de séjour estimée: <span id="predictedDuration" class="highlight"></span></p>
+                    <p class="result-detail">Intervalle de confiance: <span id="confidenceInterval"></span></p>
+                    <div class="result-info">
+                        <h4>Facteurs pris en compte:</h4>
+                        <ul id="factorsList"></ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="info-section">
+            <h2>Comment fonctionne la prédiction?</h2>
+            <div class="info-cards">
+                <div class="info-card">
+                    <h3>🔍 Modèle</h3>
+                    <p>Le modèle utilise une régression basée sur les données historiques de patients similaires.</p>
+                </div>
+                <div class="info-card">
+                    <h3>📊 Facteurs</h3>
+                    <p>L'âge, le sexe, le type d'admission et la sévérité sont les principaux prédicteurs.</p>
+                </div>
+                <div class="info-card">
+                    <h3>⚠️ Limites</h3>
+                    <p>Cette prédiction est une estimation et ne remplace pas l'évaluation médicale.</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 Healthcare Analysis Project - Guillaume-BR</p>
+    </footer>
+
+    <script src="prediction.js"></script>
+</body>
+</html>

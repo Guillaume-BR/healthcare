@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analyse des Données Médicales</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <h1>Étude Descriptive des Données Médicales</h1>
+        <nav>
+            <a href="index.html">Statistiques</a>
+            <a href="prediction.html">Prédiction Interactive</a>
+        </nav>
+    </header>
+
+    <main>
+        <section class="intro">
+            <h2>À propos de l'étude</h2>
+            <p>Cette étude analyse les données médicales de patients hospitalisés, en se concentrant sur la durée de séjour et les facteurs associés.</p>
+        </section>
+
+        <section class="statistics">
+            <h2>Statistiques Descriptives</h2>
+            
+            <div class="stat-grid">
+                <div class="stat-card">
+                    <h3>Âge Moyen</h3>
+                    <p class="stat-value">53.6 ans</p>
+                    <p class="stat-detail">Écart-type: 14.2 ans</p>
+                </div>
+
+                <div class="stat-card">
+                    <h3>Durée Moyenne de Séjour</h3>
+                    <p class="stat-value">5.8 jours</p>
+                    <p class="stat-detail">Min: 1 jour - Max: 15 jours</p>
+                </div>
+
+                <div class="stat-card">
+                    <h3>Répartition par Sexe</h3>
+                    <p class="stat-value">53% Hommes</p>
+                    <p class="stat-detail">47% Femmes</p>
+                </div>
+
+                <div class="stat-card">
+                    <h3>Type d'Admission</h3>
+                    <p class="stat-value">60% Urgence</p>
+                    <p class="stat-detail">40% Programmée</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="visualizations">
+            <h2>Visualisations</h2>
+            
+            <div class="chart-container">
+                <h3>Durée de Séjour selon la Sévérité</h3>
+                <canvas id="severityChart"></canvas>
+            </div>
+
+            <div class="chart-container">
+                <h3>Répartition par Âge</h3>
+                <canvas id="ageChart"></canvas>
+            </div>
+        </section>
+
+        <section class="findings">
+            <h2>Principales Observations</h2>
+            <ul>
+                <li><strong>Sévérité et durée:</strong> Les cas de sévérité élevée ont une durée moyenne de séjour de 10.8 jours, contre 1.6 jours pour les cas de faible sévérité.</li>
+                <li><strong>Type d'admission:</strong> Les admissions en urgence ont tendance à avoir des séjours plus longs (moyenne de 6.4 jours) comparé aux admissions programmées (3.8 jours).</li>
+                <li><strong>Âge:</strong> Une corrélation positive est observée entre l'âge et la durée de séjour, particulièrement pour les patients de plus de 65 ans.</li>
+                <li><strong>Distribution:</strong> 40% des séjours durent 4 jours ou moins, tandis que 20% dépassent 9 jours.</li>
+            </ul>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 Healthcare Analysis Project - Guillaume-BR</p>
+    </footer>
+
+    <script src="charts.js"></script>
+</body>
+</html>
