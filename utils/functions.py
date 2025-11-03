@@ -11,3 +11,4 @@ def describe_dataframe(df, name="DataFrame"):
     print(f"Duplicate Rows: {df.duplicated().sum()}")
     
     return df.info()
+
