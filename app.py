@@ -12,32 +12,32 @@ app = FastAPI(title = "Prédiction de la durée d'hospitalisation API")
 
 # 3. Define request model
 class PatientData(BaseModel):
-    Gender: str
-    Age: int
-    Alcohol: int
-    Smoking: int
-    BMI: float
-    Physical_Activity: float
-    Diet_Score: float
-    Glucose: float
-    HbA1c: float
-    Medical_Condition: str
+    gender: str
+    age: int
+    alcohol: int
+    smoking: int
+    bmi: float
+    physical_activity: float
+    diet_score: float
+    glucose: float
+    hb1ac: float
+    medical_condition: str
 
 # 4. Define prediction endpoint
 @app.post("/predict")
 def predict_hospital_stay(data: PatientData):
     # Convert input data to numpy array
     X_input = np.array([[
-        data.Gender,
-        data.Age,
-        data.Alcohol,
-        data.Smoking,
-        data.BMI,
-        data.Physical_Activity,
-        data.Diet_Score,
-        data.Glucose,
-        data.HbA1c,
-        data.Medical_Condition
+        data.gender,
+        data.age,
+        data.alcohol,
+        data.smoking,
+        data.bmi,
+        data.physical_activity,
+        data.diet_score,
+        data.glucose,
+        data.hb1ac,
+        data.medical_condition
     ]])
     #Make prediction
     prediction = model.predict(X_input)[0]
