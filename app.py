@@ -3,6 +3,8 @@ from pydantic import BaseModel
 import joblib
 import numpy as np
 
+
+
 # 1. load the trained model
 with open('model/xgb_best_model.pkl', 'rb') as f:
     model = joblib.load(f)
