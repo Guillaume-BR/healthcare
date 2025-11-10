@@ -4,9 +4,9 @@ import joblib
 import numpy as np
 import pandas as pd
 
-# ==============================
-# 1. Chargement du modèle et du préprocesseur
-# ==============================
+
+
+# 1. load the trained model
 with open('model/xgb_best_model.pkl', 'rb') as f:
     model = joblib.load(f)
 
