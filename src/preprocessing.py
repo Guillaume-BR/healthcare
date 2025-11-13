@@ -1,8 +1,14 @@
-from src.data_loader import load_data
-from utils.functions import normalize_char
-from sklearn.preprocessing import LabelEncoder
 import pandas as pd
 import numpy as np
+from utils.functions import normalize_char
+from sklearn.preprocessing import LabelEncoder
+from sklearn.feature_selection import mutual_info_regression
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.model_selection import train_test_split
+from sklearn.impute import SimpleImputer
+from sklearn.preprocessing import RobustScaler , OneHotEncoder
+from sklearn.pipeline import Pipeline
+from sklearn.compose import ColumnTransformer
 
 def clean_data(df):
     
@@ -26,7 +32,7 @@ def feature_engineering(df):
     #création de variables
     # BMI Categories (WHO Classification)
     df['bmi_category'] = pd.cut(
-        df_feat['bmi'],
+        df['bmi'],
         bins=[0, 18.5, 25, 30, 35, 40, 100],
         labels=['Underweight', 'Normal', 'Overweight', 
                'Obese_I', 'Obese_II', 'Obese_III']
@@ -64,14 +70,15 @@ def feature_engineering(df):
 
 
 def feature_selection(df):
-    """Sélection des features basées sur l'importance des variables
+    """
+    Sélection des features basées sur l'importance des variables
     en utilisant Mutual Information et Feature Importances d'un Random Forest.
     On ajoute aussi un encodage des variables catégorielles.
     """
 
     df_feat = feature_engineering(df)
 
-    # Prepare data for feature selection
+    # Prepare data for feature selection en supprimant les na notamment
     df_feat.dropna(inplace=True)
     X = df_feat.drop(['lengthofstay'], axis=1)
     y = df_feat['lengthofstay']
@@ -98,21 +105,18 @@ def feature_selection(df):
        X_encoded[col] = le.fit_transform(X_encoded[col].astype(str))
        label_encoders[col] = le
 
+    
     #Choix des variables finales à l'aide de plusieurs critères
-
+    
     # Mutual Information
-    from sklearn.feature_selection import mutual_info_regression
-
-    mi_scores = mutual_info_regression(X_encoded, y, random_state=RANDOM_STATE)
+    mi_scores = mutual_info_regression(X_encoded, y, random_state=42)
     mi_scores_df = pd.DataFrame({
         'Feature': X_encoded.columns,
         'MI Score': mi_scores
     }).sort_values('MI Score', ascending=False)
 
     # Feature Importances from Random Forest
-    from sklearn.ensemble import RandomForestRegressor
-
-    rf_model = RandomForestRegressor(n_estimators=100, random_state=RANDOM_STATE, n_jobs=-1)
+    rf_model = RandomForestRegressor(n_estimators=100, random_state=42, n_jobs=-1)
     rf_model.fit(X_encoded, y)
 
     # Get feature importances
@@ -122,10 +126,10 @@ def feature_selection(df):
     }).sort_values('Importance', ascending=False)
 
     importance_combined = pd.merge(
-    mi_scores_df, 
-    rf_importance_df, 
-    on='Feature'
-    )
+        mi_scores_df, 
+        rf_importance_df, 
+        on='Feature'
+        )
 
     # Normalize scores to 0-1 range
     importance_combined['MI_normalized'] = (importance_combined['MI Score'] / 
@@ -149,5 +153,87 @@ def feature_selection(df):
         if feature not in selected_features:
             selected_features.append(feature)
     
-    return df_feat[selected_features]
+    return selected_features
+
+def train_test_val(df):
+    """
+    Split the data into training, validation, and test sets.
+    """
+    selected_features = feature_selection(df)
+    df_feat = df[selected_features + ['lengthofstay']]
+
+
+    # Split the data into features and target variable
+    X = df_feat.drop(columns=['lengthofstay'])
+    y = df_feat['lengthofstay']
+    
+    # First split: train and test
+    X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.2, random_state=42    
+    )
+    
+    # Second split: train en train + val
+    X_train, X_val, y_train, y_val = train_test_split(
+    X_train, y_train, test_size=0.2, random_state=42    
+    )
+    
+    return {
+        "X_train": X_train,
+        "X_val": X_val,
+        "X_test": X_test,
+        "y_train": y_train,
+        "y_val": y_val,
+        "y_test": y_test
+    }
+
+#imputation et encodage
+
+def create_preprocessor(X_train):
+    """
+    Create and fit the preprocessing pipeline on training data only.
+    """
+    numeric_features = X_train.select_dtypes(include=[np.number]).columns.tolist()
+    categorical_features = X_train.select_dtypes(include=['object', 'category']).columns.tolist()
+
+    numeric_pipeline = Pipeline([
+        ('imputer', SimpleImputer(strategy='mean')),
+        ('scaler', RobustScaler())
+    ])
+
+    categorical_pipeline = Pipeline([
+        ('imputer', SimpleImputer(strategy='constant', fill_value='missing')),
+        ('encoder', OneHotEncoder(handle_unknown='ignore', sparse_output=False))
+    ])
+
+    preprocessor = ColumnTransformer([
+        ('num', numeric_pipeline, numeric_features),
+        ('cat', categorical_pipeline, categorical_features)
+    ])
+
+    # Fit only once
+    preprocessor.fit(X_train)
+    print("✅ Preprocessor fitted on training data")
+
+    return preprocessor
+
+
+def preprocess_splits(splits, preprocessor):
+    """
+    Transform train/val/test using a fitted preprocessor.
+    """
+    X_train_p = preprocessor.transform(splits["X_train"])
+    X_val_p   = preprocessor.transform(splits["X_val"])
+    X_test_p  = preprocessor.transform(splits["X_test"])
+    
+    return {
+        "X_train": X_train_p,
+        "X_val": X_val_p,
+        "X_test": X_test_p,
+        "y_train": splits["y_train"],
+        "y_val": splits["y_val"],
+        "y_test": splits["y_test"]
+    }
+
+
+
 
