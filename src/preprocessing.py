@@ -26,6 +26,8 @@ def clean_data(df):
 
     return df
 
+
+
 def feature_engineering(df):
     df = clean_data(df)
     
@@ -68,98 +70,83 @@ def feature_engineering(df):
     return df
 
 
-
-def feature_selection(df):
+def preprocess_features(df, target_col='lengthofstay'):
     """
-    Sélection des features basées sur l'importance des variables
-    en utilisant Mutual Information et Feature Importances d'un Random Forest.
-    On ajoute aussi un encodage des variables catégorielles.
+    Applique le feature engineering, gère les NaN et encode les colonnes catégorielles.
+    Renvoie X_encoded, y et dictionnaire d'encoders.
     """
-
-    df_feat = feature_engineering(df)
-
-    # Prepare data for feature selection en supprimant les na notamment
+    df_feat = feature_engineering(df)  # la fonction existante
     df_feat.dropna(inplace=True)
-    X = df_feat.drop(['lengthofstay'], axis=1)
-    y = df_feat['lengthofstay']
 
-    # IMPORTANT: Re-check for ALL categorical columns (including newly created ones)
+    X = df_feat.drop([target_col], axis=1)
+    y = df_feat[target_col]
+
     categorical_cols = X.select_dtypes(include=['object', 'category']).columns
-    numerical_cols = X.select_dtypes(include=[np.number]).columns
-    
     X_encoded = X.copy()
     label_encoders = {}
 
-    # Encodage de chaque variable catégorielle
+    #Encodage de chaque variable catégorielle
     for col in categorical_cols:
-       le = LabelEncoder()
-       # Handle different column types
-       if X_encoded[col].dtype.name == 'category':
-            # For categorical columns, convert to string first
-            X_encoded[col] = X_encoded[col].astype(str)
+        le = LabelEncoder()
+        X_encoded[col] = X_encoded[col].astype(str).fillna('missing')
+        X_encoded[col] = le.fit_transform(X_encoded[col])
+        label_encoders[col] = le
 
-        # Replace NaN with 'missing' string (now safe for all column types)
-       X_encoded[col] = X_encoded[col].fillna('missing')
+    return X_encoded, y, label_encoders
 
-       # Encode the column
-       X_encoded[col] = le.fit_transform(X_encoded[col].astype(str))
-       label_encoders[col] = le
 
-    
-    #Choix des variables finales à l'aide de plusieurs critères
-    
+def compute_feature_scores(X_encoded, y):
+    """
+    Calcule l'importance des features via Mutual Information et Random Forest,
+    normalise les scores et renvoie un dataframe combiné à partir de variables encodées.
+    """
     # Mutual Information
     mi_scores = mutual_info_regression(X_encoded, y, random_state=42)
-    mi_scores_df = pd.DataFrame({
-        'Feature': X_encoded.columns,
-        'MI Score': mi_scores
-    }).sort_values('MI Score', ascending=False)
+    mi_df = pd.DataFrame({'Feature': X_encoded.columns, 'MI Score': mi_scores})
 
-    # Feature Importances from Random Forest
-    rf_model = RandomForestRegressor(n_estimators=100, random_state=42, n_jobs=-1)
-    rf_model.fit(X_encoded, y)
+    # Random Forest
+    rf = RandomForestRegressor(n_estimators=100, random_state=42, n_jobs=-1)
+    rf.fit(X_encoded, y)
+    rf_df = pd.DataFrame({'Feature': X_encoded.columns, 'RF Score': rf.feature_importances_})
 
-    # Get feature importances
-    rf_importance_df = pd.DataFrame({
-        'Feature': X_encoded.columns,
-        'Importance': rf_model.feature_importances_
-    }).sort_values('Importance', ascending=False)
+    # Combine & normalize
+    combined = mi_df.merge(rf_df, on='Feature')
+    combined['MI_norm'] = combined['MI Score'] / combined['MI Score'].max()
+    combined['RF_norm'] = combined['RF Score'] / combined['RF Score'].max()
+    combined['Combined_Score'] = (combined['MI_norm'] + combined['RF_norm']) / 2
 
-    importance_combined = pd.merge(
-        mi_scores_df, 
-        rf_importance_df, 
-        on='Feature'
-        )
+    return combined.sort_values('Combined_Score', ascending=False)
 
-    # Normalize scores to 0-1 range
-    importance_combined['MI_normalized'] = (importance_combined['MI Score'] / 
-                                            importance_combined['MI Score'].max())
-    importance_combined['RF_normalized'] = (importance_combined['Importance'] / 
-                                            importance_combined['Importance'].max())
+def select_features(scores_df, threshold=0.1, must_have=None):
+    """
+    Sélectionne les features selon un seuil et ajoute les features obligatoires.
+    """
+    selected = scores_df.loc[scores_df['Combined_Score'] > threshold, 'Feature'].tolist()
 
-    # Combined score (average of both)
-    importance_combined['Combined_Score'] = (importance_combined['MI_normalized'] + 
-                                             importance_combined['RF_normalized']) / 2
-
-    importance_combined = importance_combined.sort_values('Combined_Score', ascending=False)
-
-    # Sélection des features basées sur un seuil de score combiné
-    threshold = 0.1  # Select features with combined score > 0.1
-    selected_features = importance_combined[importance_combined['Combined_Score'] > threshold]['Feature'].tolist()
-
-    # Always include original important features
-    must_have_features = ['age', 'bmi', 'smoking', 'alcohol', 'gender']
-    for feature in must_have_features:
-        if feature not in selected_features:
-            selected_features.append(feature)
+    if must_have:
+        for f in must_have:
+            if f not in selected:
+                selected.append(f)
     
+    return selected
+
+def feature_selection(df, target_col='lengthofstay', threshold=0.1):
+    """
+    Pipeline complet de sélection de features.
+    """
+    must_have_features = ['age', 'bmi', 'smoking', 'alcohol', 'gender']
+
+    X_encoded, y, _ = preprocess_features(df, target_col)
+    scores_df = compute_feature_scores(X_encoded, y)
+    selected_features = select_features(scores_df, threshold, must_have_features)
+
     return selected_features
 
 def train_test_val(df):
     """
     Split the data into training, validation, and test sets.
     """
-    selected_features = feature_selection(df)
+    selected_features = feature_selection(df, target_col='lengthofstay', threshold=0.1)
     df_feat = df[selected_features + ['lengthofstay']]
 
 
