@@ -12,13 +12,15 @@ def describe_dataframe(df, name="DataFrame"):
     
     return df.info()
 
-def normalize_char(df)
-    # Normalise les noms de colonnes en minuscules et remplace les espaces et tirets par des underscores
-    df.columns = df.columns.lower().str .replace(' ', '_').str.replace('-', '_')
+def normalize_char(df):
+    """
+    Normalize string columns by converting to lowercase, stripping whitespace,
+    and replacing spaces with underscores.
+    """
+    df.columns = df.columns.str.lower().str.replace(" ", "_").str.replace(r"[^a-zA-Z0-9_]", "")
 
-    #On effectue le même traitement pour les valeurs de type string
-    str_cols = df.select_dtypes(include=['object', 'string']).columns
-    for cols in str_cols:
-        df[cols] = df[cols].str.lower().str.replace(' ','_').str.replace('-','_')
+    str_cols = df.select_dtypes(include=['object', 'category']).columns
+    for col in str_cols:
+        df[col] = df[col].str.lower().str.strip().str.replace(" ", "_")
 
     return df
