@@ -37,18 +37,18 @@ X_input['alcohol'] = st.selectbox(
     "Es-tu alcoolique ?", options=["oui", "non"]
 )
 
-if X_input['alcohol'] == "oui":
-    X_input['alcohol'] = 1
+if X_input.loc[0,'alcohol']== "oui":
+    X_input.loc[0,'alcohol'] = 1
 else:
-    X_input['alcohol'] = 0
+    X_input.loc[0,'alcohol'] = 0
 
 X_input['smoking'] = st.selectbox(
     "Es-tu fumeur ?", options=["oui", "non"]
 )
-if X_input['smoking'] == "oui":
-    X_input['smoking'] = 1
+if X_input['smoking'][0] == "oui":
+    X_input['smoking'][0] = 1
 else:
-    X_input['smoking'] = 0
+    X_input['smoking'][0] = 0
 
 taille = st.number_input(
     "Quelle est ta taille en cm ?", value=None, placeholder="Type a number..."
@@ -77,7 +77,8 @@ X_input['hba1c'] = st.number_input(
 )
 
 X_input['medical_condition'] = st.selectbox(
-    "As-tu des conditions médicales préexistantes ?", options=["none", "diabetes", "hypertension", "both"]
+    "As-tu des antécédents médicaux ?", options=['diabetes', 'healthy', 'asthma', 'obesity', 'hypertension',
+       'cancer', np.nan, 'arthritis']
 )
 
 # 1. load the trained model
