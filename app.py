@@ -80,7 +80,7 @@ with open(os.path.join(wd, 'model','best_model.pkl'), 'rb') as f:
     model = joblib.load(f)
 
 #2. Load the preprocessor
-with open(os.path.join(wd, 'model','preprocessor.pkl'), 'rb) as f:
+with open(os.path.join(wd, 'model','preprocessor.pkl'), 'rb') as f:
     preprocessor = joblib.load(f)
 
 if st.button('Prédire la durée d\'hospitalisation'):
