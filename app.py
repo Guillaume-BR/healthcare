@@ -76,7 +76,7 @@ print("X_input shape:", X_input.shape)
 print(X_input)
 
 # 1. load the trained model
-with open(os.path.join(wd, 'model/xgb_best_model.pkl'), 'rb') as f:
+with open(os.path.join(wd, 'model/best_model.pkl'), 'rb') as f:
     model = joblib.load(f)
 
 #2. Load the preprocessor
