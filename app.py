@@ -22,71 +22,65 @@ st.title('La durée d\'hospitalisation prédite')
 #    "medical_condition": data.medical_condition
 #}])
 
-X_input = pd.DataFrame()
+genre = ["Homme", "Femme"]
+gender = st.segmented_control("Sexe", genre, selection_mode="single")
+age = st.number_input("Quel est ton âge ?", value=5)
+approve = ["oui", "non"]
+alcohol = st.segmented_control("Consomme-tu de l'alcool ?", approve, selection_mode="single")
+smoking = st.segmented_control("Es-tu fumeur ?", approve, selection_mode="single")
+taille = st.number_input("Quelle est ta taille en cm ?", value=175)
+poids = st.number_input("Quel est ton poids en kg ?", value=70)
+physical_activity = st.number_input("Nombre d'heures d'activité physique par semaine ?", value=3)
+diet_score = st.number_input("Score diététique (0-20) ?", value=10)
+glucose = st.number_input("Taux de glucose (mg/dL) ?", value=100)
+hba1c = st.number_input("HbA1c (%) ?", value=5)
+maladie_options = ['Bonne santé', 'Diabète', 'Asthme', 'Obésité', 'Hypertension', 'Cancer', 'Arthrite', 'Non renseigné']
+medical_condition = st.segmented_control(
+    "As-tu des antécédents médicaux ?",maladie_options
+    , selection_mode="single")
 
-X_input["gender"] = st.selectbox(
-    "Quel est ton genre ?", options=["male", "female"]
-)
+medical_options_map = {
+    'Bonne santé': 'healthy',
+    'Diabète': 'diabetes',
+    'Asthme': 'asthma',
+    'Obésité': 'obesity',
+    'Hypertension': 'hypertension',
+    'Cancer': 'cancer',
+    'Arthrite': 'arthritis',
+    'Non renseigné': 'Nan'
+}
 
-X_input['age'] = st.number_input(
-    "Quel est ton âge ?", value=None, placeholder="Type a number..."
-)
-X_input['age'] = np.floor(X_input['age'])
-
-X_input['alcohol'] = st.selectbox(
-    "Es-tu alcoolique ?", options=["oui", "non"]
-)
-
-if X_input.loc[0,'alcohol']== "oui":
-    X_input.loc[0,'alcohol'] = 1
+if medical_condition is None:
+    medical_condition_code = None
 else:
-    X_input.loc[0,'alcohol'] = 0
+    medical_condition_code = medical_options_map[medical_condition]
 
-X_input['smoking'] = st.selectbox(
-    "Es-tu fumeur ?", options=["oui", "non"]
-)
-if X_input['smoking'][0] == "oui":
-    X_input['smoking'][0] = 1
-else:
-    X_input['smoking'][0] = 0
+# generate BMI
+bmi = poids / ((taille/100) ** 2)
 
-taille = st.number_input(
-    "Quelle est ta taille en cm ?", value=None, placeholder="Type a number..."
-)
+# build dataframe correctly
+X_input = pd.DataFrame([{
+    "gender": "male" if gender == "Homme" else "female",
+    "age": np.floor(age),
+    "alcohol": 1 if alcohol == "oui" else 0,
+    "smoking": 1 if smoking == "oui" else 0,
+    "bmi": bmi,
+    "physical_activity": physical_activity,
+    "diet_score": diet_score,
+    "glucose": glucose,
+    "hba1c": hba1c,
+    "medical_condition": medical_condition_code
+}])
 
-poids = st.number_input(
-    "Quel est ton poids en kg ?", value=None, placeholder="Type a number..."
-)
-
-X_input['bmi'] = poids / ((taille / 100) ** 2)
-
-X_input['physical_activity'] = st.number_input(
-    "Combien d'heures par semaine fais-tu d'activité physique ?", value=None, placeholder="Type a number..."
-)
-
-X_input['diet_score'] = st.number_input(
-    "Quel est ton score diététique (entre 0 et 20) ?", value=None, placeholder="Type a number..."
-)
-
-X_input['glucose'] = st.number_input(
-    "Quel est ton taux de glucose sanguin (mg/dL) ?", value=None, placeholder="Type a number..."
-)
-
-X_input['hba1c'] = st.number_input(
-    "Quel est ton taux d'HbA1c (%) ?", value=None, placeholder="Type a number..."
-)
-
-X_input['medical_condition'] = st.selectbox(
-    "As-tu des antécédents médicaux ?", options=['diabetes', 'healthy', 'asthma', 'obesity', 'hypertension',
-       'cancer', np.nan, 'arthritis']
-)
+print("X_input shape:", X_input.shape)
+print(X_input)
 
 # 1. load the trained model
-with open(os.path.join(wd, 'models/xgb_best_model.pkl'), 'rb') as f:
+with open(os.path.join(wd, 'model/xgb_best_model.pkl'), 'rb') as f:
     model = joblib.load(f)
 
 #2. Load the preprocessor
-with open(os.path.join(wd, 'models/preprocessor.pkl'), 'rb') as f:
+with open(os.path.join(wd, 'model/preprocessor.pkl'), 'rb') as f:
     preprocessor = joblib.load(f)
 
 if st.button('Prédire la durée d\'hospitalisation'):
@@ -96,4 +90,4 @@ if st.button('Prédire la durée d\'hospitalisation'):
     # Prédiction
     prediction = model.predict(X_processed)[0]
 
-    st.success(f"La durée d'hospitalisation prédite est de {round(float(prediction), 2)} jours.")   
+    st.success(f"La durée d'hospitalisation envisagée est de {round(int(prediction))} jours.")   
