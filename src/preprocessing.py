@@ -201,6 +201,8 @@ def create_preprocessor(X_train):
     preprocessor.fit(X_train)
     print("✅ Preprocessor fitted on training data")
 
+    joblib.dump(preprocessor, '../models/preprocessor.pkl')
+    print("✅ Preprocessor sauvegardé sous '../models/preprocessor.pkl'")
     return preprocessor
 
 

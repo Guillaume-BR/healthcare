@@ -45,3 +45,4 @@ def save_model(model, model_name, folder='models'):
     os.makedirs(folder, exist_ok=True)
     joblib.dump(model, f'{folder}/{model_name}.joblib')
     print(f"Model '{model_name}' saved in '{folder}/'")
+
