@@ -1,4 +1,4 @@
-def describe_dataframe(df, name="DataFrame"):
+def describe_dataframe(df: pd.DataFrame , name="DataFrame"):
     """
     Comprehensive DataFrame description with memory usage and data types
     """
@@ -12,7 +12,7 @@ def describe_dataframe(df, name="DataFrame"):
     
     return df.info()
 
-def normalize_char(df):
+def normalize_char(df: pd.DataFrame) -> pd.DataFrame:
     """
     Normalize string columns by converting to lowercase, stripping whitespace,
     and replacing spaces with underscores.

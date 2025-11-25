@@ -1,5 +1,6 @@
 import pandas as pd
 import numpy as np
+from typing import Dict, Any, Tuple
 
 # Modèles de bases
 from sklearn.linear_model import (
@@ -16,9 +17,9 @@ from sklearn.neighbors import KNeighborsRegressor
 # Modèles avancés
 import xgboost as xgb
 import lightgbm as lgb
-from catboost import CatBoostRegressor, Pool
+from catboost import CatBoostRegressor
 
-def train_linear_regression(X_train, y_train):
+def train_linear_regression(X_train: np.ndarray, y_train: np.ndarray) -> RegressorMixin:
     """
     Entraîne un modèle de régression linéaire et renvoie le modèle entraîné.
     """
@@ -26,7 +27,7 @@ def train_linear_regression(X_train, y_train):
     lr_model.fit(X_train, y_train)
     return lr_model
 
-def train_ridge(X_train, y_train):
+def train_ridge(X_train: np.ndarray, y_train:np.ndarray) -> RegressorMixin:
     """
     Entraîne un RidgeCV et renvoie le modèle Ridge final entraîné.
     """
@@ -40,7 +41,7 @@ def train_ridge(X_train, y_train):
     
     return ridge_model
 
-def train_lasso(X_train, y_train):
+def train_lasso(X_train: np.ndarray, y_train: np.ndarray) -> RegressorMixin:
     """
     Entraîne un LassoCV et renvoie le modèle Lasso final entraîné.
     """
@@ -54,7 +55,7 @@ def train_lasso(X_train, y_train):
     
     return lasso_model
 
-def train_elasticnet(X_train, y_train):
+def train_elasticnet(X_train: np.ndarray, y_train: np.ndarray) -> RegressorMixin:
     """
     Entraîne un ElasticNetCV et renvoie le modèle ElasticNet final entraîné.
     """
@@ -68,7 +69,7 @@ def train_elasticnet(X_train, y_train):
     
     return elasticnet_model
 
-def train_knn(X_train, y_train):
+def train_knn(X_train: np.ndarray, y_train: np.ndarray) -> RegressorMixin:
     """
     Entraîne un KNeighbors Regressor et renvoie le modèle entraîné.
     """
@@ -76,7 +77,7 @@ def train_knn(X_train, y_train):
     knn_model.fit(X_train, y_train)
     return knn_model
 
-def train_decision_tree(X_train, y_train):
+def train_decision_tree(X_train: np.ndarray, y_train: np.ndarray) -> RegressorMixin:
     """
     Entraîne un Decision Tree Regressor et renvoie le modèle entraîné.
     """
@@ -84,7 +85,7 @@ def train_decision_tree(X_train, y_train):
     dt_model.fit(X_train, y_train)
     return dt_model
 
-def train_random_forest(X_train, y_train):
+def train_random_forest(X_train: np.ndarray, y_train: np.ndarray) -> RegressorMixin:
     """
     Entraîne un Random Forest Regressor et renvoie le modèle entraîné.
     """
@@ -92,7 +93,7 @@ def train_random_forest(X_train, y_train):
     rf_model.fit(X_train, y_train)
     return rf_model
 
-def gradient_boosting(X_train, y_train):
+def gradient_boosting(X_train: np.ndarray, y_train: np.ndarray) -> RegressorMixin:
     """
     Entraîne un Gradient Boosting Regressor et renvoie le modèle entraîné.
     """
@@ -100,7 +101,7 @@ def gradient_boosting(X_train, y_train):
     gb_model.fit(X_train, y_train)
     return gb_model
 
-def train_xgboost(X_train, y_train):
+def train_xgboost(X_train: np.ndarray, y_train: np.ndarray) -> RegressorMixin:
     """
     Entraîne un modèle XGBoost Regressor et renvoie le modèle entraîné.
     """
@@ -129,7 +130,7 @@ def train_xgboost(X_train, y_train):
     print(f"Best XGBoost parameters: {xgb_random_search.best_params_}")
     return xgb_model
 
-def train_lightgbm(X_train, y_train):
+def train_lightgbm(X_train: np.ndarray, y_train: np.ndarray) -> RegressorMixin:
     """
     Entraîne un modèle LightGBM Regressor et renvoie le modèle entraîné.
     """
@@ -158,7 +159,7 @@ def train_lightgbm(X_train, y_train):
     print(f"Best LightGBM parameters: {lgb_random_search.best_params_}")
     return lgb_model
 
-def train_catboost(X_train, y_train):
+def train_catboost(X_train: np.ndarray, y_train: np.ndarray) -> RegressorMixin:
     """
     Entraîne un modèle CatBoost Regressor et renvoie le modèle entraîné.
     """
@@ -174,7 +175,7 @@ def train_catboost(X_train, y_train):
     cat_model.fit(X_train, y_train)
     return cat_model
 
-def train_all_models(X_train, y_train):
+def train_all_models(X_train: np.ndarray, y_train: np.ndarray) -> dict:
     """
     Entraîne tous les modèles et retourne un dictionnaire {nom: modèle entraîné}.
     """

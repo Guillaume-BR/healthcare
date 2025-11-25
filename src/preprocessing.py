@@ -10,7 +10,7 @@ from sklearn.preprocessing import RobustScaler , OneHotEncoder
 from sklearn.pipeline import Pipeline
 from sklearn.compose import ColumnTransformer
 
-def clean_data(df):
+def clean_data(df: pd.DataFrame) -> pd.DataFrame:
     
     # Normalisation des chaînes de caractères
     df = normalize_char(df)
@@ -28,7 +28,7 @@ def clean_data(df):
 
 
 
-def feature_engineering(df):
+def feature_engineering(df: pd.DataFrame) -> pd.DataFrame:
     df = clean_data(df)
     
     #création de variables
@@ -70,7 +70,7 @@ def feature_engineering(df):
     return df
 
 
-def preprocess_features(df, target_col='lengthofstay'):
+def preprocess_features(df: pd.DataFrame, target_col: str = 'lengthofstay') -> Tuple[pd.DataFrame, pd.Series, Dict[str, LabelEncoder]]:
     """
     Applique le feature engineering, gère les NaN et encode les colonnes catégorielles.
     Renvoie X_encoded, y et dictionnaire d'encoders.
@@ -95,7 +95,7 @@ def preprocess_features(df, target_col='lengthofstay'):
     return X_encoded, y, label_encoders
 
 
-def compute_feature_scores(X_encoded, y):
+def compute_feature_scores(X_encoded: pd.DataFrame, y: pd.Series) -> pd.DataFrame:
     """
     Calcule l'importance des features via Mutual Information et Random Forest,
     normalise les scores et renvoie un dataframe combiné à partir de variables encodées.
@@ -117,7 +117,7 @@ def compute_feature_scores(X_encoded, y):
 
     return combined.sort_values('Combined_Score', ascending=False)
 
-def select_features(scores_df, threshold=0.1, must_have=None):
+def select_features(scores_df: pd.DataFrame, threshold: float = 0.1, must_have: list = None) -> list:
     """
     Sélectionne les features selon un seuil et ajoute les features obligatoires.
     """
@@ -130,7 +130,7 @@ def select_features(scores_df, threshold=0.1, must_have=None):
     
     return selected
 
-def feature_selection(df, target_col='lengthofstay', threshold=0.1):
+def feature_selection(df: pd.DataFrame, target_col: str = 'lengthofstay', threshold: float = 0.1) -> list:
     """
     Pipeline complet de sélection de features.
     """
@@ -142,7 +142,7 @@ def feature_selection(df, target_col='lengthofstay', threshold=0.1):
 
     return selected_features
 
-def train_test_val(df):
+def train_test_val(df: pd.DataFrame) -> dict:
     """
     Split the data into training, validation, and test sets.
     """
@@ -175,7 +175,7 @@ def train_test_val(df):
 
 #imputation et encodage
 
-def create_preprocessor(X_train):
+def create_preprocessor(X_train: pd.DataFrame) -> ColumnTransformer:
     """
     Create and fit the preprocessing pipeline on training data only.
     """
@@ -206,7 +206,7 @@ def create_preprocessor(X_train):
     return preprocessor
 
 
-def preprocess_splits(splits, preprocessor):
+def preprocess_splits(splits: dict, preprocessor: ColumnTransformer) -> dict:
     """
     Transform train/val/test using a fitted preprocessor.
     """
