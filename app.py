@@ -86,7 +86,6 @@ st.markdown("""
 
 # Sidebar avec informations et options
 with st.sidebar:
-    st.image("https://cdn-icons-png.flaticon.com/512/2913/2913133.png", width=100)
     st.title("📋 Navigation")
     
     page = st.radio(
@@ -101,7 +100,7 @@ with st.sidebar:
             <h4>⚕️ Informations</h4>
             <p><strong>Version:</strong> 1.0</p>
             <p><strong>Modèle:</strong> ML Prédictif</p>
-            <p><strong>Précision:</strong> 85%+</p>
+            <p><strong>Précision:</strong> 56%+</p>
         </div>
     """, unsafe_allow_html=True)
     
@@ -267,7 +266,7 @@ elif page == "📊 À propos du modèle":
             <div class="info-box">
                 <h4>🎯 Performance</h4>
                 <ul>
-                    <li>Précision: > 85%</li>
+                    <li>Précision: > 56%</li>
                     <li>Entraîné sur des données réelles</li>
                     <li>Validation croisée effectuée</li>
                     <li>Mis à jour régulièrement</li>
